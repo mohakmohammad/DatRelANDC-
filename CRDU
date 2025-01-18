@@ -1,0 +1,508 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+/*namespace ConsoleApp3
+{
+    internal class Program
+    {
+
+        static string connetionString = "Server =. ;Database=ContactsDB; User Id =sa;Password =sa123456; ";
+
+        static void PrintAllContatcs(String StartWith)
+
+        {
+            
+            SqlConnection connection = new SqlConnection(connetionString);
+
+            String query = "select * from Contacts where  FirstName like '' + @StartWith + '%'";
+
+
+
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+
+            command.Parameters.AddWithValue("@StartWith", StartWith);
+           
+            try
+            {
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    int contactID = (int)reader["ContactID"];
+                    string firstName = reader["FirstName"].ToString();
+                    string lastName = reader["LastName"].ToString();
+                    string email = reader["Email"].ToString();
+                    string phoneNumber = reader["Phone"].ToString();
+                    string address = reader["Address"].ToString();
+                    int countryID = (int)reader["CountryID"];
+
+                    Console.WriteLine($"Contact ID: {contactID}");
+                    Console.WriteLine($"First Name: {firstName}");
+                    Console.WriteLine($"Last Name: {lastName}");
+                    Console.WriteLine($"Email: {email}");
+                    Console.WriteLine($"Phone Number: {phoneNumber}");
+                    Console.WriteLine($"Address: {address}");
+                    Console.WriteLine($"Country ID: {countryID}");
+                    Console.WriteLine("-------------------------------------------------");
+
+                }
+                reader.Close();
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+
+
+
+            static void Main(string[] args)
+            {
+                PrintAllContatcs("j");
+
+            }
+        }
+    }*/
+
+
+/*namespace ConsoleApp3
+{
+    internal class Program
+    {
+
+        static string connetionString = "Server =. ;Database=ContactsDB; User Id =sa;Password =sa123456; ";
+
+        static String GetFirstName(int ContactID)
+
+        {
+            String FirstName = "";
+            
+            SqlConnection connection = new SqlConnection(connetionString);
+
+            String query = "select FirstName from Contacts where ContactID=@ContactID";
+
+
+
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+
+            command.Parameters.AddWithValue("@ContactID", ContactID);
+           
+            try
+            {
+                connection.Open();
+                 object result = command.ExecuteScalar();
+
+                if (result != null)
+                {
+                    FirstName = (String)result;
+                }
+                else
+                {
+                   return "No God ";
+                }
+
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error : "+e.Message);
+            }
+            return FirstName;
+
+        }
+
+
+
+            static void Main(string[] args)
+            {
+            Console.WriteLine(GetFirstName(5));
+           
+
+            }
+        }
+    }
+*/
+
+/*namespace ConsoleApp3
+{
+    internal class Program
+    {
+
+        static string connetionString = "Server =. ;Database=ContactsDB; User Id =sa;Password =sa123456; ";
+
+        static bool FindContactId(int ContactID ,ref stContact ContactInfo )
+
+        {
+            bool isFound = false;
+            
+            SqlConnection connection = new SqlConnection(connetionString);
+
+            String query = "select * from Contacts where ContactID=@ContactID";
+
+
+
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+
+            command.Parameters.AddWithValue("@ContactID", ContactID);
+           
+            try
+            {
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                   isFound = true;
+
+                    ContactInfo.ContactID = (int)reader["ContactID"];
+                    ContactInfo.FirstName = reader["FirstName"].ToString();
+                    ContactInfo.LastName = reader["LastName"].ToString();
+                    ContactInfo.Email = reader["Email"].ToString();
+                    ContactInfo.Phone = reader["Phone"].ToString();
+                    ContactInfo.Address = reader["Address"].ToString();
+                    ContactInfo.CountryID = (int)reader["CountryID"];
+                }
+                else
+                {
+                    isFound = false;
+                }
+                reader.Close();
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error : "+e.Message);
+            }
+            return isFound;
+
+        }
+
+        public struct stContact
+        {
+        
+        public int ContactID { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            
+            public string Phone { get; set; }
+            public string Address { get; set; }
+            public int CountryID { get; set; }
+
+
+
+
+        }
+
+            static void Main(string[] args)
+            {
+
+            stContact ContactInfo = new stContact();
+
+            if(FindContactId(125, ref ContactInfo))
+            {
+                Console.WriteLine($"Contact ID: {ContactInfo.ContactID}");
+                Console.WriteLine($"First Name: {ContactInfo.FirstName}  {ContactInfo.LastName}");
+              
+                Console.WriteLine($"Email: {ContactInfo.Email}");
+                Console.WriteLine($"Phone Number: {ContactInfo.Phone}");
+                Console.WriteLine($"Address: {ContactInfo.Address}");
+                Console.WriteLine($"Country ID: {ContactInfo.CountryID}");
+            }
+            else
+            {
+                Console.WriteLine("Contact Not Found");
+            }
+
+
+
+
+        }
+        }
+    }*/
+
+/*namespace ConsoleApp3
+{
+    internal class Program
+    {
+
+        static string connetionString = "Server =. ;Database=ContactsDB; User Id =sa;Password =sa123456; ";
+
+
+        public struct stContact
+        {
+
+
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+
+            public string Phone { get; set; }
+            public string Address { get; set; }
+            public int CountryID { get; set; }
+
+
+
+
+        }
+        static void AddNewContact(stContact newContact )
+
+        {
+        
+            
+            SqlConnection connection = new SqlConnection(connetionString);
+
+            String query = @"INSERT INTO Contacts (FirstName,LastName,Email,Phone,Address,CountryID)
+                VALUES (@FirstName,@LastName,@Email,@Phone,@Address,@CountryID);
+                   SELECT SCOPE_IDENTITY(); ";
+
+
+
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+
+            command.Parameters.AddWithValue("@FirstName", newContact.FirstName);
+            command.Parameters.AddWithValue("@LastName", newContact.LastName);
+            command.Parameters.AddWithValue("@Email", newContact.Email);
+            command.Parameters.AddWithValue("@Phone", newContact.Phone);
+            command.Parameters.AddWithValue("@Address", newContact.Address);
+            command.Parameters.AddWithValue("@CountryID", newContact.CountryID);
+
+
+            try
+            {
+                connection.Open();
+               object result = command.ExecuteScalar();
+
+                if (result != null && int.TryParse(result.ToString(),out int insertedID) )
+                {
+                    Console.WriteLine($"Newly is insertedID:{insertedID}");
+                }
+                else
+                {
+                    Console.WriteLine("Record is Not insertedID");
+                }
+                
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error : "+e.Message);
+            }
+          
+
+        }
+
+      
+
+            static void Main(string[] args)
+            {
+
+            stContact Contact = new stContact
+            {
+
+                FirstName = "Bader",
+                LastName = "Hasan",
+                Email = "Bader2@yahoo.com",
+                Phone = "0798475117",
+                Address = "AQBA",
+                CountryID = 1
+            };
+
+            AddNewContact(Contact);
+
+
+
+
+
+        }
+        }
+    }
+*/
+
+/*namespace ConsoleApp3
+{
+    internal class Program
+    {
+
+        static string connetionString = "Server =. ;Database=ContactsDB; User Id =sa;Password =sa123456; ";
+
+
+        public struct stContact
+        {
+
+
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+
+            public string Phone { get; set; }
+            public string Address { get; set; }
+            public int CountryID { get; set; }
+
+
+
+
+        }
+        static void AddNewContact(int ContactID, stContact newContact )
+
+        {
+        
+            
+            SqlConnection connection = new SqlConnection(connetionString);
+
+            String query = @"UPDATE Contacts
+                        set FirstName = @FirstName,
+                            LastName = @LastName,
+                            Email = @Email,
+                            Phone = @Phone,
+                            Address = @Address, 
+                            CountryID = @CountryID
+                             where ContactID = @ContactID";
+
+
+
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ContactID", ContactID);
+            command.Parameters.AddWithValue("@FirstName", newContact.FirstName);
+            command.Parameters.AddWithValue("@LastName", newContact.LastName);
+            command.Parameters.AddWithValue("@Email", newContact.Email);
+            command.Parameters.AddWithValue("@Phone", newContact.Phone);
+            command.Parameters.AddWithValue("@Address", newContact.Address);
+            command.Parameters.AddWithValue("@CountryID", newContact.CountryID);
+
+
+            try
+            {
+                connection.Open();
+               int  rowsAffcted = command.ExecuteNonQuery();
+
+                if (rowsAffcted > 0 )
+                {
+                    Console.WriteLine("UPDATE is Godd");
+                }
+                else
+                {
+                    Console.WriteLine("Not is UPDATE");
+                }
+                
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error : "+e.Message);
+            }
+          
+
+        }
+
+      
+
+            static void Main(string[] args)
+            {
+
+            stContact ContactInfo = new stContact
+            {
+
+                FirstName = "Mohammad",
+                LastName = "Hasan",
+                Email = "Mohammad@yahoo.com",
+                Phone = "0798475117",
+                Address = "AQBA",
+                CountryID = 1
+            };
+
+            AddNewContact(11,ContactInfo);
+
+
+
+
+
+        }
+        }
+    }*/
+
+namespace ConsoleApp3
+{
+    internal class Program
+    {
+
+        static string connetionString = "Server =. ;Database=ContactsDB; User Id =sa;Password =sa123456; ";
+
+
+        static void DeleteContact(int ContactID )
+
+        {
+        
+            
+            SqlConnection connection = new SqlConnection(connetionString);
+
+            String query = @"DELETE FROM Contacts
+                       WHERE ContactID = @ContactID";
+
+
+
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@ContactID", ContactID);
+
+
+
+
+            try
+            {
+                connection.Open();
+               int  rowsAffcted = command.ExecuteNonQuery();
+
+                if (rowsAffcted > 0 )
+                {
+                    Console.WriteLine("DELETE is Godd");
+                }
+                else
+                {
+                    Console.WriteLine("Not is DELETE");
+                }
+                
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error : "+e.Message);
+            }
+          
+
+        }
+
+      
+
+            static void Main(string[] args)
+            {
+
+
+
+            DeleteContact(2);
+
+
+
+
+
+        }
+        }
+    }
